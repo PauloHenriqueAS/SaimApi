@@ -9,7 +9,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get("/HealthCheck")
+@router.get("/")
 def get_health_check_api():
     """
     Return date time now
