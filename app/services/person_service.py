@@ -6,27 +6,35 @@ This module contains person-methods.
 """
 
 from app.models import Person
+from app.repositorys.person_repository import person_repository
+from sqlalchemy.exc import IntegrityError
 
 class PersonService:
     """
     return algo
     """
-    def get_person_by_code(self, id_pessoa: int):
+    def get_person_by_code(self, id_user: int):
         """
-        return algo
+        Get person data by code
         """
-        return {"mensagem": f"id do usuario {id_pessoa}"}
+        return person_repository.get_person_by_code(id_user)
 
-    def post_user(self, data_person: Person):
+    def post_person(self, data_person: Person):
         """
-        return algo
+        Insert new data person
         """
-        return {"mensagem": f"dados do usurio para inserção = {data_person}"}
-
-    def update_password_user(self, data_person: Person):
+        try:
+            data_person.id_pessoa = person_repository.generate_id_person()
+            breakpoint()
+            print(data_person.id_pessoa)
+            return person_repository.post_person(data_person)
+        except IntegrityError  as error:
+            return {f"Erro na atualização de senha. tente novamente. ERRO: {error}"}
+        
+    def update_person(self, data_person: Person):
         """
-        return algo
+        Update data person
         """
-        return {"mensagem": f"dados do usurio para atualização = {data_person}"}
+        return person_repository.update_person(data_person)
 
 person_service = PersonService()

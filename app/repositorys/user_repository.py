@@ -30,11 +30,11 @@ class UserRepository :
             db.close()
 
             if user is None:
-                return {"mensagem": "Usuário não cadastrado"}
+                return {"code": 302, "mensagem": "Usuário não cadastrado"}
             else:
                 return { user }
         except IntegrityError as error:
-            return {"mensagem": f"Erro ao obter usuário. ERRO: {error}"}
+            return {"code": 404, "mensagem": f"Erro ao obter usuário. ERRO: {error}"}
         
     def post_user(self, data_user: User):
         """
@@ -53,12 +53,12 @@ class UserRepository :
             db.commit()
             db.close()
 
-            return { "code": 200, "mensagem": "Usuário cadastrado com sucesso."}
+            return { "code": 201, "mensagem": "Usuário cadastrado com sucesso."}
         except IntegrityError as error:
             db.rollback()
-            return {"mensagem": "Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}"}
+            return {"code": 400, "mensagem": "Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}"}
         except Exception as error:
-            return {"mensagem": f"ERRO: {error}"}
+            return {"code": 400, "mensagem": f"ERRO: {error}"}
         
     def update_password_user(self, data_user: User):
         """
@@ -77,9 +77,9 @@ class UserRepository :
             return { "code": 200, "mensagem": "Senha atualizada com sucesso."}
         except IntegrityError as error:
             db.rollback() 
-            return {"mensagem": f"Erro ao atualizar usuário. ERRO: {error}"}
+            return {"code": 400, "mensagem": f"Erro ao atualizar usuário. ERRO: {error}"}
         except Exception as error:
-            return {"mensagem": f"ERRO: {error}"}
+            return {"code": 400, "mensagem": f"ERRO: {error}"}
         
     def generate_id_user(self):
         """
@@ -92,6 +92,6 @@ class UserRepository :
             if max_id_user is not None:
                 return max_id_user + 1
         except Exception as error:
-            return {"mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+            return {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
                     
 user_repository  = UserRepository ()

@@ -10,12 +10,12 @@ from app.services import person_service
 
 router = APIRouter()
 
-@router.get("/GetPersonByCode/{id_pessoa}")
-def get_person_by_code(id_pessoa: int):
+@router.get("/GetPersonByCode")
+def get_person_by_code(id_user: int):
     """
     Return data from person by id
     """
-    return person_service.get_person_by_code(id_pessoa)
+    return person_service.get_person_by_code(id_user)
 
 @router.post("/PostPerson")
 def post_person(data_person: Person):

@@ -17,7 +17,6 @@ class UserService:
         """
         Get data user by email user
         """
-        #breakpoint()
         return user_repository.get_user_by_code( email_user)
 
     def autenticate_user(self, data_user: User):
@@ -46,6 +45,7 @@ class UserService:
             return user_repository.update_password_user(data_user)
         except IntegrityError  as error:
             return {f"Erro na atualização de senha. tente novamente. ERRO: {error}"}
+        
 def encript_password_user(password: str):
     '''
     Method to encrip user password

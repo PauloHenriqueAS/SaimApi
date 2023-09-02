@@ -11,7 +11,7 @@ class Person(BaseModel):
     """
     Model of Person
     """
-    id_pessoa: int
+    id_pessoa: Optional[int] = None
     instituicao_pessoa: str
     uf_pessoa: str
     nome_pessoa: str
