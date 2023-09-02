@@ -25,12 +25,10 @@ class PersonService:
         """
         try:
             data_person.id_pessoa = person_repository.generate_id_person()
-            breakpoint()
-            print(data_person.id_pessoa)
             return person_repository.post_person(data_person)
         except IntegrityError  as error:
             return {f"Erro na atualização de senha. tente novamente. ERRO: {error}"}
-        
+                
     def update_person(self, data_person: Person):
         """
         Update data person

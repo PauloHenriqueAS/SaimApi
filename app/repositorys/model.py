@@ -1,8 +1,16 @@
-from sqlalchemy import Column, Integer, String, func
-from datetime import datetime
+"""
+app/Repositorys/model.py
+
+This module contains database models.
+"""
+
+from sqlalchemy import Column, Integer, String
 from app.repositorys.configDb import Base
 
 class UserDb(Base):
+    '''
+    Model User Database
+    '''
     __tablename__ = 'tb_usuario'
     __table_args__ = {"schema": "saim"}
 
@@ -11,6 +19,9 @@ class UserDb(Base):
     password_user = Column(String, index=True)
 
 class PersonDb(Base):
+    '''
+    Model Person Database
+    '''
     __tablename__ = 'tb_pessoa'
     __table_args__ = {"schema": "saim"}
 
@@ -20,5 +31,3 @@ class PersonDb(Base):
     nome_pessoa = Column(String, index=True)
     tipo_pessoa = Column(String, index=True)
     id_user = Column(Integer, index=True)
-
-#UserDb = UserDb()
