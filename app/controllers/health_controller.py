@@ -14,4 +14,4 @@ def get_health_check_api():
     """
     Return date time now
     """
-    return datetime.datetime.now()
+    return { "code": 200, "mensagem": datetime.datetime.now()}

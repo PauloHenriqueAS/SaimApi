@@ -1,51 +1,46 @@
-
 """
-app/Repository s/user_Repository .py
+app/Repository/user_Repository .py
 
 This module contains user-methods.
 """
 
-from app.repositorys.configDb import engine
 from app.models import User
 from app.repositorys.model import UserDb
 from .configDb import SessionLocal
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-#from app.repositorys.schemas import UserSchema
-
-
 
 class UserRepository :
     """
-    return algo
+    Repository User
     """
     def autenticate_user(self, data_user: User):
         """
-        return algo
+        Autheticate user data
         """
         return {"mensagem": f"dados do usurio para autenticação = {data_user}"}
-
-    def get_usuario_by_code(self, email_user: str):
+        
+    def get_user_by_code(self, email_user: str):
         """
-        return algo
+        Get data user by email user
         """
         try:
             db = SessionLocal()
-            user  =  db.query(UserDb).filter(UserDb.email_user == email_user).first()
+            user = db.query(UserDb).filter(UserDb.email_user == email_user).first()
             db.close()
 
             if user is None:
                 return {"mensagem": "Usuário não cadastrado"}
             else:
                 return { user }
-        except Exception as e:
-            return {"mensagem": f"Erro ao obter usuário. ERRO: {str(e)}"}
-
+        except IntegrityError as error:
+            return {"mensagem": f"Erro ao obter usuário. ERRO: {error}"}
+        
     def post_user(self, data_user: User):
         """
-        return algo
+        Insert new data user
         """
-        try: 
+        try:
             db = SessionLocal()
 
             data_new_user_db = UserDb(
@@ -53,49 +48,50 @@ class UserRepository :
                 email_user=data_user.email_user,
                 password_user=data_user.password_user
             )
-            breakpoint()
-            print(str(data_new_user_db.password_user))
-            print(str(data_user.id_user))
 
             db.add(data_new_user_db)
             db.commit()
             db.close()
-        except IntegrityError as e:
-            db.rollback()  # Desfaz a transação em caso de erro
-            return {"mensagem": "Erro ao cadastrar usuário. O email já está em uso. ERRO: {e}"}
-        except Exception as e:
-            return {"mensagem": f"ERRO: {e}"}
 
+            return { "code": 200, "mensagem": "Usuário cadastrado com sucesso."}
+        except IntegrityError as error:
+            db.rollback()
+            return {"mensagem": "Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}"}
+        except Exception as error:
+            return {"mensagem": f"ERRO: {error}"}
+        
     def update_password_user(self, data_user: User):
         """
-        return algo
+        Update user password
         """
-        try: 
+        try:
             db = SessionLocal()
-
+            
             user_data_db = db.query(UserDb).filter(UserDb.email_user == data_user.email_user).first()
             if user_data_db:
                 user_data_db.password_user = data_user.password_user
+
             db.commit()
             db.close()
-        except IntegrityError as e:
-            db.rollback()  # Desfaz a transação em caso de erro
-            return {"mensagem": "Erro ao atualizar usuário. ERRO: {e}"}
-        except Exception as e:
-            return {"mensagem": f"ERRO: {e}"}
 
+            return { "code": 200, "mensagem": "Senha atualizada com sucesso."}
+        except IntegrityError as error:
+            db.rollback() 
+            return {"mensagem": f"Erro ao atualizar usuário. ERRO: {error}"}
+        except Exception as error:
+            return {"mensagem": f"ERRO: {error}"}
+        
     def generate_id_user(self):
         """
-        return algo
+        Generate new id user to insert method
         """
-        try: 
+        try:
             db = SessionLocal()
             max_id_user = db.query(func.max(UserDb.id_user)).scalar()
             db.close()
             if max_id_user is not None:
                 return max_id_user + 1
-        except Exception as e:
-            return {"mensagem": f"Erro ao consultar id máximo. ERRO: {e}"}
-        
-        
+        except Exception as error:
+            return {"mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+                    
 user_repository  = UserRepository ()
