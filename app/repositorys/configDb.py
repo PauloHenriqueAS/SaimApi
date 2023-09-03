@@ -7,8 +7,12 @@ This module contains database configurations.
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import json
 
-DATABASE_URL = "postgresql://postgres:iP0vskRkccKZc2TUgb8C@database-weatherwise.cdi5ncgph4r1.sa-east-1.rds.amazonaws.com:5432/db_WeatherWise"
+with open('../config.json', 'r') as config_file:
+    config_data = json.load(config_file)
+
+DATABASE_URL = config_data["database_url"]
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
