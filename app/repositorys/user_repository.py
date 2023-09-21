@@ -32,7 +32,7 @@ class UserRepository :
             if user is None:
                 return {"code": 302, "mensagem": "Usuário não cadastrado"}
             else:
-                return { user }
+                return user 
         except IntegrityError as error:
             return {"code": 404, "mensagem": f"Erro ao obter usuário. ERRO: {error}"}
         

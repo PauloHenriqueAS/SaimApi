@@ -6,6 +6,8 @@ COnfigurations of FastAPI
 
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app import (
     user_router,
     health_router,
@@ -21,8 +23,13 @@ app = FastAPI(
     description="SaimAPI - Processamento de Imagens de Madeira",
     version="1.0.0",
     )
- # Mapeamento de User para UserDb
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #app.include_router(authentication_router, prefix="/authentication", tags=["Authentication"])
 app.include_router(user_router, prefix="/user", tags=["User"])

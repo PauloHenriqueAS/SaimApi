@@ -4,7 +4,7 @@ models.py
 This module contains all models that are being used in api.
 """
 
-from typing import Optional
+from typing import Optional, Text
 from pydantic import BaseModel
 
 class Person(BaseModel):
@@ -26,14 +26,14 @@ class User(BaseModel):
     email_user: str
     password_user: str
 
-class ImageBD(BaseModel):
+class Image(BaseModel):
     """
     Model of Image
     """
     id_image: Optional[int] = None
     image: str
 
-class PersonImageBD(BaseModel):
+class PersonImage(BaseModel):
     """
     Model of Relation Image and Person
     """
@@ -41,11 +41,11 @@ class PersonImageBD(BaseModel):
     id_pessoa: int
     id_imagem: int
 
-class DataFullPersonImageBD(BaseModel):
+class DataFullPersonImage(BaseModel):
     """
     Model of full data from relation Image and Person
     """
     id_img_pes: Optional[int] = None
+    id_imagem: Optional[int] = None
     id_pessoa: int
-    id_imagem: int
-    image: str
+    image: Text

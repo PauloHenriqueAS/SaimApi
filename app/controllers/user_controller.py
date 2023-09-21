@@ -17,6 +17,13 @@ def get_user_by_code(email_user: str):
     """
     return user_service.get_user_by_code(email_user)
 
+@router.post("/AutenticateUser")
+def autenticate_user(data_user: User):
+    """
+    Verify if user have access to system
+    """
+    return user_service.autenticate_user(data_user)
+
 @router.post("/PostUser")
 def post_user(data_user: User):
     """

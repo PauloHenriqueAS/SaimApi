@@ -5,28 +5,140 @@ app/Repository s/image_Repository .py
 This module contains image-methods.
 """
 
-from app.models import DataFullPersonImageBD
+from app.models import DataFullPersonImage
+from app.repositorys.model import PersonImageBD, DataImageDb
+from .configDb import SessionLocal
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 
 class ImageRepository :
     """
     return algo
     """
-    def get_image_by_code(self, id_pessoa: int):
+    def get_image_by_code(self, id_image: int):
         """
-        return algo
+        Get Image by code
         """
-        return {"mensagem": f"id do usuario {id_pessoa}"}
+        try:
+            db = SessionLocal()
+            image = db.query(DataImageDb).filter(DataImageDb.id_image == id_image).first()
+            db.close()
 
-    def post_image(self, data_image: DataFullPersonImageBD):
-        """
-        return algo
-        """
-        return {"mensagem": f"dados do usurio para inserção = {data_image}"}
+            if image is None:
+                return {"code": 302, "mensagem": "Imagem não encontrada"}
+            else:
+                return image 
+        except IntegrityError as error:
+            return {"code": 404, "mensagem": f"Erro ao obter imagem. ERRO: {error}"}
 
-    def update_image(self, data_image: DataFullPersonImageBD):
+    def get_all_images_by_person(self, id_person: int):
         """
-        return algo
+        Get Image by code
         """
-        return {"mensagem": f"dados do usurio para atualização = {data_image}"}
+        try:
+            db = SessionLocal()
+            lst_img_person = db.query(PersonImageBD).filter(PersonImageBD.id_pessoa == id_person).all()
+            db.close()
 
+            if not lst_img_person:
+                return []
+            else:
+                return [{'id_image': img_pes.id_image} for img_pes in lst_img_person]
+        except IntegrityError as error:
+            return {"code": 404, "mensagem": f"Erro ao obter imagem. ERRO: {error}"}
+       
+    def post_image(self, data_image: DataFullPersonImage):
+        """
+        Insert new data image
+        """
+        try:
+            db = SessionLocal()
+
+            data_new_image_db = DataImageDb(
+                id_image=data_image.id_imagem,
+                image=data_image.image
+            )
+
+            db.add(data_new_image_db)
+            db.commit()
+            db.close()
+
+            return True 
+        except IntegrityError as error:
+            db.rollback()
+            return {"code": 400, "mensagem": "Erro ao cadastrar imagem. ERRO: {error}"}
+        except Exception as error:
+            return {"code": 400, "mensagem": f"ERRO: {error}"}
+        
+    def post_relation_image(self, data_image: DataFullPersonImage):
+        """
+        Insert new relation data image-person
+        """
+        try:
+            db = SessionLocal()
+
+            data_new_relation_image_db = PersonImageBD(
+                id_img_pes=data_image.id_img_pes,
+                id_pessoa=data_image.id_pessoa,
+                id_image=data_image.id_imagem
+            )
+
+            db.add(data_new_relation_image_db)
+            db.commit()
+            db.close()
+
+            return True 
+        except IntegrityError as error:
+            db.rollback()
+            return {"code": 400, "mensagem": "Erro ao cadastrar relação de imagem e pessoa. ERRO: {error}"}
+        except Exception as error:
+            return {"code": 400, "mensagem": f"ERRO: {error}"}
+        
+    def update_image(self, data_image: DataFullPersonImage):
+        """
+        Update data image
+        """
+        try:
+            db = SessionLocal()
+            
+            image_data_db = db.query(DataImageDb).filter(DataImageDb.id_image == data_image.id_imagem).first()
+            if image_data_db:
+                image_data_db.image = data_image.image
+
+            db.commit()
+            db.close()
+
+            return { "code": 200, "mensagem": "Imagem atualizada com sucesso."}
+        except IntegrityError as error:
+            db.rollback() 
+            return {"code": 400, "mensagem": f"Erro ao atualizar imagem. ERRO: {error}"}
+        except Exception as error:
+            return {"code": 400, "mensagem": f"ERRO: {error}"}
+        
+    def generate_id_image(self):
+        """
+        Generate new id image to insert method
+        """
+        try:
+            db = SessionLocal()
+            max_id_image = db.query(func.max(DataImageDb.id_image)).scalar()
+            db.close()
+            if max_id_image is not None:
+                return max_id_image + 1
+        except Exception as error:
+            return {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+               
+    def generate_id_relation(self):
+        """
+        Generate new id user to insert method
+        """
+        try:
+            db = SessionLocal()
+            max_id_img_pes = db.query(func.max(PersonImageBD.id_img_pes)).scalar()
+            db.close()
+            if max_id_img_pes is not None:
+                return max_id_img_pes + 1
+        except Exception as error:
+            return {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+    
 image_repository  = ImageRepository ()

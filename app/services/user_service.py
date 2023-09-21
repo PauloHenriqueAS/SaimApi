@@ -23,7 +23,15 @@ class UserService:
         """
         Autenticate user system
         """
-        return {"mensagem": f"dados do usurio para autenticação = {data_user}"}
+        try:
+            user_data_db = user_repository.get_user_by_code(data_user.email_user)
+            is_valid = validate_password_user(user_data_db.password_user, data_user.password_user)
+            if is_valid:
+                return {'mensagem': 'Usuário autenticado com sucesso', 'data': True}
+            else: 
+                return {'mensagem': 'Usuário sem acesso ao sistema', 'data': False}
+        except IntegrityError as error:
+            return {f"Erro na autenticação do usuário. tente novamente. ERRO: {error}"}
 
     def post_user(self, data_user: User):
         """
@@ -55,5 +63,15 @@ def encript_password_user(password: str):
     hash_object.update(password_bytes)
     hash_hex = hash_object.hexdigest()
     return hash_hex
+
+def validate_password_user(password_db: str, password_request: str):
+    '''
+    Method to verify user password in data base and in requestuser password
+    '''
+    password_hash_request = encript_password_user(password_request)
+    if password_db == password_hash_request:
+        return True
+    else:
+        return False
 
 user_service = UserService()
