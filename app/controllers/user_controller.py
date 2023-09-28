@@ -5,7 +5,7 @@ This module contains user-related routes.
 """
 
 from fastapi import APIRouter
-from app.models import User
+from app.models import User, UserFull
 from app.services import user_service
 
 router = APIRouter()
@@ -30,6 +30,14 @@ def post_user(data_user: User):
     Post data from a new user
     """
     return user_service.post_user(data_user)
+
+@router.post("/PostFullUser")
+def post_user_full(data_user_full: UserFull):
+    """
+    Post data from a new user
+    """
+    return user_service.post_user_full(data_user_full)
+
 
 @router.patch("/UpdatePasswordUser")
 def update_password_user(data_user: User):

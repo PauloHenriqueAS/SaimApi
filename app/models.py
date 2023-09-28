@@ -26,6 +26,20 @@ class User(BaseModel):
     email_user: str
     password_user: str
 
+class UserFull(BaseModel):
+    """
+    Model of Full data User 
+    """
+    id_user: Optional[int] = None
+    id_pessoa: Optional[int] = None
+    email_user: str
+    password_user: str
+    nome_pessoa: str
+    uf_pessoa: str
+    instituicao_pessoa: str
+    password_confirmation: str
+    tipo_pessoa: str
+
 class Image(BaseModel):
     """
     Model of Image

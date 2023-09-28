@@ -11,25 +11,28 @@ from .configDb import SessionLocal
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-class PersonRepository :
+
+class PersonRepository:
     """
     Person Repository
     """
+
     def get_person_by_code(self, id_user: int):
         """
         Get data person by id user
         """
         try:
             db = SessionLocal()
-            person = db.query(PersonDb).filter(PersonDb.id_user == id_user).first()
+            person = db.query(PersonDb).filter(
+                PersonDb.id_user == id_user).first()
             db.close()
 
             if person is None:
-                return {"code": 404,"mensagem": "Nehuma pessoa encontrada."}
+                return {"code": 404, "mensagem": "Nehuma pessoa encontrada."}
             else:
-                return { person }
+                return {person}
         except IntegrityError as error:
-            return {"code": 400,"mensagem": f"Erro ao obter dados pessoa. ERRO: {error}"}
+            return {"code": 400, "mensagem": f"Erro ao obter dados pessoa. ERRO: {error}"}
 
     def post_person(self, data_person: Person):
         """
@@ -51,12 +54,12 @@ class PersonRepository :
             db.commit()
             db.close()
 
-            return { "code": 201, "mensagem": "Pessoa cadastrado com sucesso."}
+            return {"code": 201, "mensagem": "Pessoa cadastrado com sucesso.", 'data': True}
         except IntegrityError as error:
             db.rollback()
-            return {"code": 400, "mensagem": "Erro ao cadastrar pessoa. ERRO: {error}"}
+            return {"code": 400, "mensagem": "Erro ao cadastrar pessoa. ERRO: {error}", 'data': False}
         except Exception as error:
-            return {"code": 400, "mensagem": f"ERRO: {error}"}
+            return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
 
     def update_person(self, data_person: Person):
         """
@@ -64,8 +67,9 @@ class PersonRepository :
         """
         try:
             db = SessionLocal()
-            
-            person_data_db = db.query(PersonDb).filter(PersonDb.id_user == data_person.id_user).first()
+
+            person_data_db = db.query(PersonDb).filter(
+                PersonDb.id_user == data_person.id_user).first()
             if person_data_db:
                 person_data_db.instituicao_pessoa = data_person.instituicao_pessoa
                 person_data_db.uf_pessoa = data_person.uf_pessoa
@@ -75,9 +79,9 @@ class PersonRepository :
             db.commit()
             db.close()
 
-            return { "code": 200, "mensagem": "Pessoa atualizada com sucesso."}
+            return {"code": 200, "mensagem": "Pessoa atualizada com sucesso."}
         except IntegrityError as error:
-            db.rollback() 
+            db.rollback()
             return {"code": 400, "mensagem": f"Erro ao atualizar dados da pessoa. ERRO: {error}"}
         except Exception as error:
             return {"code": 400, "mensagem": f"ERRO: {error}"}
@@ -94,5 +98,6 @@ class PersonRepository :
                 return max_id_pessoa + 1
         except Exception as error:
             return {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
-        
-person_repository  = PersonRepository ()
+
+
+person_repository = PersonRepository()

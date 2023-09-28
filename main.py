@@ -6,6 +6,7 @@ COnfigurations of FastAPI
 
 
 from fastapi import FastAPI
+#from .jwt import TokenRequest, Token
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import (
@@ -24,12 +25,16 @@ app = FastAPI(
     version="1.0.0",
     )
 
+# Configurar CORS (para permitir solicitações de diferentes origens)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Atualize isso para limitar as origens permitidas
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Importar e usar as rotas de autenticação
+#from .jwt import login_for_access_token, protected_route
 
 #app.include_router(authentication_router, prefix="/authentication", tags=["Authentication"])
 app.include_router(user_router, prefix="/user", tags=["User"])
