@@ -16,13 +16,13 @@ class UserRepository:
     Repository User
     """
 
-    def autenticate_user(self, data_user: User):
+    async def autenticate_user(self, data_user: User):
         """
         Autheticate user data
         """
         return {"mensagem": f"dados do usurio para autenticação = {data_user}"}
 
-    def get_user_by_code(self, email_user: str):
+    async def get_user_by_code(self, email_user: str):
         """
         Get data user by email user
         """
@@ -39,13 +39,13 @@ class UserRepository:
         except IntegrityError as error:
             return {"code": 404, "mensagem": f"Erro ao obter usuário. ERRO: {error}"}
 
-    def post_user(self, data_user: User):
+    async def post_user(self, data_user: User):
         """
         Insert new data user
         """
         try:
             db = SessionLocal()
-
+            
             data_new_user_db = UserDb(
                 id_user=data_user.id_user,
                 email_user=data_user.email_user,
@@ -63,7 +63,7 @@ class UserRepository:
         except Exception as error:
             return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
 
-    def post_user_full(self, data_user_full: UserFull):
+    async def post_user_full(self, data_user_full: UserFull):
         """
         Insert new user data
         """
@@ -102,7 +102,7 @@ class UserRepository:
         except Exception as error:
             return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
 
-    def update_password_user(self, data_user: User):
+    async def update_password_user(self, data_user: User):
         """
         Update user password
         """
@@ -124,7 +124,7 @@ class UserRepository:
         except Exception as error:
             return {"code": 400, "mensagem": f"ERRO: {error}"}
 
-    def generate_id_user(self):
+    async def generate_id_user(self):
         """
         Generate new id user to insert method
         """

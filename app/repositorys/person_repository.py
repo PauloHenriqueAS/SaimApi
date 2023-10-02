@@ -17,7 +17,7 @@ class PersonRepository:
     Person Repository
     """
 
-    def get_person_by_code(self, id_user: int):
+    async def get_person_by_code(self, id_user: int):
         """
         Get data person by id user
         """
@@ -28,13 +28,13 @@ class PersonRepository:
             db.close()
 
             if person is None:
-                return {"code": 404, "mensagem": "Nehuma pessoa encontrada."}
+                return  {"code": 404, "mensagem": "Nehuma pessoa encontrada."}
             else:
-                return {person}
+                return  {person}
         except IntegrityError as error:
-            return {"code": 400, "mensagem": f"Erro ao obter dados pessoa. ERRO: {error}"}
+            return  {"code": 400, "mensagem": f"Erro ao obter dados pessoa. ERRO: {error}"}
 
-    def post_person(self, data_person: Person):
+    async def post_person(self, data_person: Person):
         """
         Insert new data person
         """
@@ -54,14 +54,14 @@ class PersonRepository:
             db.commit()
             db.close()
 
-            return {"code": 201, "mensagem": "Pessoa cadastrado com sucesso.", 'data': True}
+            return  {"code": 201, "mensagem": "Pessoa cadastrado com sucesso.", 'data': True}
         except IntegrityError as error:
             db.rollback()
-            return {"code": 400, "mensagem": "Erro ao cadastrar pessoa. ERRO: {error}", 'data': False}
+            return  {"code": 400, "mensagem": "Erro ao cadastrar pessoa. ERRO: {error}", 'data': False}
         except Exception as error:
-            return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
+            return  {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
 
-    def update_person(self, data_person: Person):
+    async def update_person(self, data_person: Person):
         """
         Update user password
         """
@@ -79,14 +79,14 @@ class PersonRepository:
             db.commit()
             db.close()
 
-            return {"code": 200, "mensagem": "Pessoa atualizada com sucesso."}
+            return  {"code": 200, "mensagem": "Pessoa atualizada com sucesso."}
         except IntegrityError as error:
             db.rollback()
-            return {"code": 400, "mensagem": f"Erro ao atualizar dados da pessoa. ERRO: {error}"}
+            return  {"code": 400, "mensagem": f"Erro ao atualizar dados da pessoa. ERRO: {error}"}
         except Exception as error:
-            return {"code": 400, "mensagem": f"ERRO: {error}"}
+            return  {"code": 400, "mensagem": f"ERRO: {error}"}
 
-    def generate_id_person(self):
+    async def generate_id_person(self):
         """
         Generate new id user to insert method
         """
@@ -95,9 +95,9 @@ class PersonRepository:
             max_id_pessoa = db.query(func.max(PersonDb.id_pessoa)).scalar()
             db.close()
             if max_id_pessoa is not None:
-                return max_id_pessoa + 1
+                return  max_id_pessoa + 1
         except Exception as error:
-            return {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+            return  {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
 
 
 person_repository = PersonRepository()

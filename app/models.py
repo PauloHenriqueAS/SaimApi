@@ -4,6 +4,7 @@ models.py
 This module contains all models that are being used in api.
 """
 
+from datetime import date
 from typing import Optional, Text
 from pydantic import BaseModel
 
@@ -45,6 +46,7 @@ class Image(BaseModel):
     Model of Image
     """
     id_image: Optional[int] = None
+    date_image: Optional[date] = None
     image: str
 
 class PersonImage(BaseModel):
@@ -61,5 +63,6 @@ class DataFullPersonImage(BaseModel):
     """
     id_img_pes: Optional[int] = None
     id_imagem: Optional[int] = None
+    date_image: Optional[date] = None
     id_pessoa: int
     image: Text

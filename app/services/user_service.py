@@ -16,21 +16,19 @@ class UserService:
     User Service with logic
     """
 
-    def get_user_by_code(self, email_user: str):
+    async def get_user_by_code(self, email_user: str):
         """
         Get data user by email user
         """
-        return user_repository.get_user_by_code(email_user)
+        return await user_repository.get_user_by_code(email_user)
 
-    def autenticate_user(self, data_user: User):
+    async def autenticate_user(self, data_user: User):
         """
         Autenticate user system
         """
         try:
-            user_data_db = user_repository.get_user_by_code(
-                data_user.email_user)
-            is_valid = validate_password_user(
-                user_data_db.password_user, data_user.password_user)
+            user_data_db = await user_repository.get_user_by_code( data_user.email_user)
+            is_valid = await validate_password_user(user_data_db.password_user, data_user.password_user)
             if is_valid:
                 return {'mensagem': 'Usuário autenticado com sucesso', 'data': True}
             else:
@@ -38,63 +36,58 @@ class UserService:
         except IntegrityError as error:
             return {f"Erro na autenticação do usuário. tente novamente. ERRO: {error}"}
 
-    def post_user(self, data_user: User):
+    async def post_user(self, data_user: User):
         """
         Insert new user data
         """
         try:
-            data_user.id_user = user_repository.generate_id_user()
-            data_user.password_user = encript_password_user(
-                data_user.password_user)
-            return user_repository.post_user(data_user)
+            data_user.id_user = await user_repository.generate_id_user()
+            data_user.password_user = await encript_password_user(data_user.password_user)
+            return await user_repository.post_user(data_user)
         except IntegrityError as error:
             return {f"Erro na encriptação da senha. tente novamente. ERRO: {error}"}
 
-    def post_user_with_return(self, data_user: User):
+    async def post_user_with_return(self, data_user: User):
         """
         Insert new user data
         """
         try:
-            data_user.id_user = user_repository.generate_id_user()
-            data_user.password_user = encript_password_user(
-                data_user.password_user)
-            return user_repository.post_user_with_return(data_user)
+            data_user.id_user = await user_repository.generate_id_user()
+            data_user.password_user = await encript_password_user( data_user.password_user)
+            return await user_repository.post_user_with_return(data_user)
         except IntegrityError as error:
             return {f"Erro na encriptação da senha. tente novamente. ERRO: {error}"}
 
-    def post_user_full(self, data_user_full: UserFull):
+    async def post_user_full(self, data_user_full: UserFull):
         """
         Insert new user data
         """
         try:
-            is_valid = validate_password_request(
-                data_user_full.password_user, data_user_full.password_confirmation)
+            is_valid = await validate_password_request(data_user_full.password_user, data_user_full.password_confirmation)
 
             if is_valid:
-                data_user_full.id_user = user_repository.generate_id_user()
-                data_user_full.id_pessoa = person_repository.generate_id_person()
-                data_user_full.password_user = encript_password_user(
-                    data_user_full.password_user)
+                data_user_full.id_user = await user_repository.generate_id_user()
+                data_user_full.id_pessoa = await person_repository.generate_id_person()
+                data_user_full.password_user = await encript_password_user(data_user_full.password_user)
 
-                return user_repository.post_user_full(data_user_full)
+                return await user_repository.post_user_full(data_user_full)
             else:
                 return {'mensagem': 'Senhas inválidas', 'data': False}
         except IntegrityError as error:
             return {'mensagem': f"Erro na encriptação da senha. tente novamente. ERRO: {error}", 'data': False}
 
-    def update_password_user(self, data_user: User):
+    async def update_password_user(self, data_user: User):
         '''
         Update user password
         '''
         try:
-            data_user.password_user = encript_password_user(
-                data_user.password_user)
-            return user_repository.update_password_user(data_user)
+            data_user.password_user = await encript_password_user(data_user.password_user)
+            return await user_repository.update_password_user(data_user)
         except IntegrityError as error:
             return {f"Erro na atualização de senha. tente novamente. ERRO: {error}"}
 
 
-def encript_password_user(password: str):
+async def encript_password_user(password: str):
     '''
     Method to encrip user password
     '''
@@ -105,7 +98,7 @@ def encript_password_user(password: str):
     return hash_hex
 
 
-def validate_password_user(password_db: str, password_request: str):
+async def validate_password_user(password_db: str, password_request: str):
     '''
     Method to verify user password in data base and in requestuser password
     '''
@@ -116,7 +109,7 @@ def validate_password_user(password_db: str, password_request: str):
         return False
 
 
-def validate_password_request(password_request: str, password_confirm: str):
+async def validate_password_request(password_request: str, password_confirm: str):
     '''
     Method to verify user password front request to insert
     '''
