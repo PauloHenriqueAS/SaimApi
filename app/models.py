@@ -47,6 +47,7 @@ class Image(BaseModel):
     """
     id_image: Optional[int] = None
     date_image: Optional[date] = None
+    name_image: Optional[str] = None
     image: str
 
 class PersonImage(BaseModel):
@@ -64,5 +65,6 @@ class DataFullPersonImage(BaseModel):
     id_img_pes: Optional[int] = None
     id_imagem: Optional[int] = None
     date_image: Optional[date] = None
+    name_image: Optional[str] = None
     id_pessoa: int
     image: Text

@@ -42,6 +42,7 @@ class DataImageDb(Base):
     id_image = Column(Integer, primary_key=True, index=True)
     image = Column(Text, index=True)
     date_image = Column(Date, index=True)
+    name_image = Column(String, index=True)
 
 class PersonImageBD(Base):
     '''

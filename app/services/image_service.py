@@ -8,6 +8,7 @@ This module contains image-methods.
 from app.models import DataFullPersonImage
 from app.repositorys.image_repository import image_repository
 from sqlalchemy.exc import IntegrityError
+from app.middleware import saim_api_response
 
 
 class ImageService:
@@ -19,7 +20,7 @@ class ImageService:
         """
         Get image by id image
         """
-        return await image_repository.get_image_by_code(id_image)
+        return await saim_api_response.create_response(True, await image_repository.get_image_by_code(id_image))
 
     async def get_image_by_person(self, id_pessoa: int):
         """
@@ -34,7 +35,7 @@ class ImageService:
                 data_image = await image_repository.get_image_by_code(item['id_image'])
                 list_images_person.append(data_image)
 
-            return list_images_person
+            return await saim_api_response.create_response(True, list_images_person)
         except Exception as error:
             raise error
 
@@ -52,7 +53,7 @@ class ImageService:
             insert_relation = await image_repository.post_relation_image(data_image)
 
             if (insert_image == True) and (insert_relation == True):
-                return {"code": 201, "mensagem": "Cadastro de imagem realizado com sucesso."}
+                await saim_api_response.create_response(True,"Cadastro de imagem realizado com sucesso.")
         except Exception as error:
             raise error
 
@@ -60,6 +61,6 @@ class ImageService:
         """
         Update data image
         """
-        return await image_repository.update_image(data_image)
+        return await saim_api_response.create_response(True, await image_repository.update_image(data_image))
 
 image_service = ImageService()

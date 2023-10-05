@@ -20,7 +20,7 @@ class UserRepository:
         """
         Autheticate user data
         """
-        return {"mensagem": f"dados do usurio para autenticação = {data_user}"}
+        return f"dados do usurio para autenticação = {data_user}"
 
     async def get_user_by_code(self, email_user: str):
         """
@@ -33,11 +33,11 @@ class UserRepository:
             db.close()
 
             if user is None:
-                return {"code": 302, "mensagem": "Usuário não cadastrado"}
+                return "Usuário não cadastrado"
             else:
                 return user
         except IntegrityError as error:
-            return {"code": 404, "mensagem": f"Erro ao obter usuário. ERRO: {error}"}
+            return f"Erro ao obter usuário. ERRO: {error}"
 
     async def post_user(self, data_user: User):
         """
@@ -45,7 +45,7 @@ class UserRepository:
         """
         try:
             db = SessionLocal()
-            
+
             data_new_user_db = UserDb(
                 id_user=data_user.id_user,
                 email_user=data_user.email_user,
@@ -56,12 +56,12 @@ class UserRepository:
             db.commit()
             db.close()
 
-            return {"code": 201, "mensagem": "Usuário cadastrado com sucesso.", 'data': True}
+            return "Usuário cadastrado com sucesso."
         except IntegrityError as error:
             db.rollback()
-            return {"code": 400, "mensagem": "Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}", 'data': False}
+            return "Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}"
         except Exception as error:
-            return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
+            return f"ERRO: {error}"
 
     async def post_user_full(self, data_user_full: UserFull):
         """
@@ -93,14 +93,14 @@ class UserRepository:
 
                 transaction.commit()
 
-                return {'mensagem': 'Cadastro realizado sucesso.', 'data': True}
+                return 'Cadastro realizado sucesso.'
             except Exception as error:
                 transaction.rollback()
-                return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
+                return f"ERRO: {error}"
             finally:
                 db.close()
         except Exception as error:
-            return {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
+            return f"ERRO: {error}"
 
     async def update_password_user(self, data_user: User):
         """
@@ -117,12 +117,12 @@ class UserRepository:
             db.commit()
             db.close()
 
-            return {"code": 200, "mensagem": "Senha atualizada com sucesso."}
+            return "Senha atualizada com sucesso."
         except IntegrityError as error:
             db.rollback()
-            return {"code": 400, "mensagem": f"Erro ao atualizar usuário. ERRO: {error}"}
+            return f"Erro ao atualizar usuário. ERRO: {error}"
         except Exception as error:
-            return {"code": 400, "mensagem": f"ERRO: {error}"}
+            return f"ERRO: {error}"
 
     async def generate_id_user(self):
         """
@@ -135,7 +135,7 @@ class UserRepository:
             if max_id_user is not None:
                 return max_id_user + 1
         except Exception as error:
-            return {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}", 'data': False}
+            return f"Erro ao consultar id máximo. ERRO: {error}"
 
 
 user_repository = UserRepository()

@@ -15,4 +15,4 @@ async def get_health_check_api():
     """
     Return date time now
     """
-    return saim_api_response.create_response(True, datetime.datetime.now())
+    return await saim_api_response.create_response(True, datetime.datetime.now())

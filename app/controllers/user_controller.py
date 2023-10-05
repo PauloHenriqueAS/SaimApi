@@ -7,7 +7,6 @@ This module contains user-related routes.
 from fastapi import APIRouter
 from app.models import User, UserFull
 from app.services import user_service
-from app.middleware import saim_api_response
 
 router = APIRouter()
 
@@ -23,8 +22,10 @@ async def autenticate_user(data_user: User):
     """
     Verify if user have access to system
     """
-    return await saim_api_response.create_response(True, 'riofjore', 'dofdjmfo')
-    #return await user_service.autenticate_user(data_user)
+    #return await saim_api_response.create_response(True, 'riofjore', 'dofdjmfo')
+    print(data_user)
+
+    return await user_service.autenticate_user(data_user)
 
 @router.post("/PostUser")
 async def post_user(data_user: User):
