@@ -3,7 +3,7 @@ app/Repository/user_Repository .py
 
 This module contains user-methods.
 """
-
+from app.middleware import saim_api_response
 from app.models import User, UserFull
 from app.repositorys.model import PersonDb, UserDb
 from .configDb import SessionLocal
@@ -33,11 +33,11 @@ class UserRepository:
             db.close()
 
             if user is None:
-                return "Usuário não cadastrado"
+                return None
             else:
                 return user
         except IntegrityError as error:
-            return f"Erro ao obter usuário. ERRO: {error}"
+            await saim_api_response.create_error_response(message=f"Erro ao obter usuário. ERRO: {error}")
 
     async def post_user(self, data_user: User):
         """
@@ -59,21 +59,23 @@ class UserRepository:
             return "Usuário cadastrado com sucesso."
         except IntegrityError as error:
             db.rollback()
-            return "Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}"
+            await saim_api_response.create_error_response(message=f"Erro ao cadastrar usuário. O email já está em uso. ERRO: {error}")
         except Exception as error:
-            return f"ERRO: {error}"
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
 
     async def post_user_full(self, data_user_full: UserFull):
         """
         Insert new user data
         """
         try:
+            breakpoint()
             db = SessionLocal()
             transaction = db.begin()
 
+            print(data_user_full.id_user)
             try:
                 data_user = UserDb(
-                    id_user=data_user_full.id_user,
+                    id_user=data_user_full.id_user if data_user_full.id_user is not None else 1,
                     email_user=data_user_full.email_user,
                     password_user=data_user_full.password_user
                 )
@@ -81,12 +83,12 @@ class UserRepository:
                 db.flush()
 
                 data_person = PersonDb(
-                    id_pessoa=data_user_full.id_pessoa,
+                    id_pessoa=data_user_full.id_pessoa if data_user_full.id_pessoa is not None else 1,
                     instituicao_pessoa=data_user_full.instituicao_pessoa,
                     uf_pessoa=data_user_full.uf_pessoa,
                     nome_pessoa=data_user_full.nome_pessoa,
                     tipo_pessoa=data_user_full.tipo_pessoa,
-                    id_user=data_user_full.id_user
+                    id_user=data_user_full.id_user if data_user_full.id_user is not None else 1
                 )
                 db.add(data_person)
                 db.flush()
@@ -96,11 +98,12 @@ class UserRepository:
                 return 'Cadastro realizado sucesso.'
             except Exception as error:
                 transaction.rollback()
-                return f"ERRO: {error}"
+                print(f"ERRO: {error}")
+                await saim_api_response.create_error_response(message=f"{error}")
             finally:
                 db.close()
         except Exception as error:
-            return f"ERRO: {error}"
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
 
     async def update_password_user(self, data_user: User):
         """
@@ -120,9 +123,9 @@ class UserRepository:
             return "Senha atualizada com sucesso."
         except IntegrityError as error:
             db.rollback()
-            return f"Erro ao atualizar usuário. ERRO: {error}"
+            await saim_api_response.create_error_response(message=f"Erro ao atualizar usuário. ERRO: {error}")
         except Exception as error:
-            return f"ERRO: {error}"
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
 
     async def generate_id_user(self):
         """
@@ -135,7 +138,6 @@ class UserRepository:
             if max_id_user is not None:
                 return max_id_user + 1
         except Exception as error:
-            return f"Erro ao consultar id máximo. ERRO: {error}"
-
+            await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
 
 user_repository = UserRepository()

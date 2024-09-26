@@ -27,7 +27,7 @@ class PersonService:
             data_person.id_pessoa = await person_repository.generate_id_person()
             return await saim_api_response.create_response(True, None, await person_repository.post_person(data_person))
         except IntegrityError  as error:
-            return await saim_api_response.create_response(False, None, f"Erro na atualização de senha. tente novamente. ERRO: {error}")
+            await saim_api_response.create_error_response(message=f"Erro na atualização de senha. tente novamente. ERRO: {error}")
                 
     async def update_person(self, data_person: Person):
         """

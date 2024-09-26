@@ -37,7 +37,7 @@ class ImageService:
 
             return await saim_api_response.create_response(True, list_images_person)
         except Exception as error:
-            raise error
+            await saim_api_response.create_error_response(message=f"Erro ao obter a imagem. tente novamente. ERRO: {error}")
 
     async def post_image(self, data_image: DataFullPersonImage):
         """
@@ -55,7 +55,7 @@ class ImageService:
             if (insert_image == True) and (insert_relation == True):
                 await saim_api_response.create_response(True,"Cadastro de imagem realizado com sucesso.")
         except Exception as error:
-            raise error
+            await saim_api_response.create_error_response(message=f"Erro no cadastro da imagem. tente novamente. ERRO: {error}")
 
     async def update_image(self, data_image: DataFullPersonImage):
         """

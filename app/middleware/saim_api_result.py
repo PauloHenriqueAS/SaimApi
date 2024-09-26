@@ -10,9 +10,8 @@ class SaimApiResponse:
             "success": success,
         }
         return response
-    
-    # async def create_error_response(self, message: str):
-    #     return await self.create_response(success=False, message=message)
 
+    async def create_error_response(self, message: str): 
+        raise HTTPException(status_code=404, detail=message)
+    
 saim_api_response = SaimApiResponse()
-# raise HTTPException(status_code=404, detail="Recurso não encontrado")

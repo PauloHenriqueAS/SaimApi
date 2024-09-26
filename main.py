@@ -23,6 +23,7 @@ app = FastAPI(
     title="SaimAPI",
     description="SaimAPI - Processamento de Imagens de Madeira",
     version="1.0.0",
+    swagger_favicon_url="../favicon.png",
     )
 
 # Configurar CORS (para permitir solicitações de diferentes origens)

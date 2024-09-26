@@ -4,7 +4,7 @@ app/Repository s/image_Repository .py
 
 This module contains image-methods.
 """
-
+from app.middleware import saim_api_response
 import datetime
 from app.models import DataFullPersonImage
 from app.repositorys.model import PersonImageBD, DataImageDb
@@ -26,11 +26,11 @@ class ImageRepository :
             db.close()
 
             if image is None:
-                return  {"code": 302, "mensagem": "Imagem não encontrada"}
+                await saim_api_response.create_error_response(message="Imagem não encontrada")
             else:
                 return  image 
         except IntegrityError as error:
-            return  {"code": 404, "mensagem": f"Erro ao obter imagem. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao obter imagem. ERRO: {error}")
 
     async def get_all_images_by_person(self, id_person: int):
         """
@@ -46,7 +46,7 @@ class ImageRepository :
             else:
                 return  [{'id_image': img_pes.id_image} for img_pes in lst_img_person]
         except IntegrityError as error:
-            return  {"code": 404, "mensagem": f"Erro ao obter imagem. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao obter imagem. ERRO: {error}")
        
     async def post_image(self, data_image: DataFullPersonImage):
         """
@@ -68,9 +68,9 @@ class ImageRepository :
             return  True 
         except IntegrityError as error:
             db.rollback()
-            return  {"code": 400, "mensagem": "Erro ao cadastrar imagem. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao cadastrar imagem. ERRO: {error}")
         except Exception as error:
-            return  {"code": 400, "mensagem": f"ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
         
     async def post_relation_image(self, data_image: DataFullPersonImage):
         """
@@ -92,9 +92,9 @@ class ImageRepository :
             return  True 
         except IntegrityError as error:
             db.rollback()
-            return  {"code": 400, "mensagem": "Erro ao cadastrar relação de imagem e pessoa. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao cadastrar relação de imagem e pessoa. ERRO: {error}")
         except Exception as error:
-            return  {"code": 400, "mensagem": f"ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
         
     async def update_image(self, data_image: DataFullPersonImage):
         """
@@ -113,9 +113,9 @@ class ImageRepository :
             return  { "code": 200, "mensagem": "Imagem atualizada com sucesso."}
         except IntegrityError as error:
             db.rollback() 
-            return  {"code": 400, "mensagem": f"Erro ao atualizar imagem. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao atualizar imagem. ERRO: {error}")
         except Exception as error:
-            return  {"code": 400, "mensagem": f"ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
         
     async def generate_id_image(self):
         """
@@ -128,7 +128,7 @@ class ImageRepository :
             if max_id_image is not None:
                 return  max_id_image + 1
         except Exception as error:
-            return  {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
                
     async def generate_id_relation(self):
         """
@@ -141,6 +141,6 @@ class ImageRepository :
             if max_id_img_pes is not None:
                 return  max_id_img_pes + 1
         except Exception as error:
-            return  {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
     
 image_repository  = ImageRepository ()

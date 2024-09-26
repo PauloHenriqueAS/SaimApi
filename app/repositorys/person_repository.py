@@ -4,7 +4,7 @@ app/Repository s/person_Repository .py
 
 This module contains person-methods.
 """
-
+from app.middleware import saim_api_response
 from app.models import Person
 from app.repositorys.model import PersonDb
 from .configDb import SessionLocal
@@ -28,12 +28,14 @@ class PersonRepository:
             db.close()
 
             if person is None:
-                return  {"code": 404, "mensagem": "Nehuma pessoa encontrada."}
+                await saim_api_response.create_error_response(message=f"Nehuma pessoa encontrada.")
             else:
-                return  {person}
+                return {person}
         except IntegrityError as error:
-            return  {"code": 400, "mensagem": f"Erro ao obter dados pessoa. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao obter dados pessoa. ERRO: {error}")
 
+# except IntegrityError as error:
+#             raise saim_api_response.create_error_response(detail=f"Erro ao obter usuário. ERRO: {error}")
     async def post_person(self, data_person: Person):
         """
         Insert new data person
@@ -57,9 +59,9 @@ class PersonRepository:
             return  {"code": 201, "mensagem": "Pessoa cadastrado com sucesso.", 'data': True}
         except IntegrityError as error:
             db.rollback()
-            return  {"code": 400, "mensagem": "Erro ao cadastrar pessoa. ERRO: {error}", 'data': False}
+            await saim_api_response.create_error_response(message=f"Erro ao cadastrar pessoa. ERRO: {error}")
         except Exception as error:
-            return  {"code": 400, "mensagem": f"ERRO: {error}", 'data': False}
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
 
     async def update_person(self, data_person: Person):
         """
@@ -82,9 +84,9 @@ class PersonRepository:
             return  {"code": 200, "mensagem": "Pessoa atualizada com sucesso."}
         except IntegrityError as error:
             db.rollback()
-            return  {"code": 400, "mensagem": f"Erro ao atualizar dados da pessoa. ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"Erro ao atualizar dados da pessoa. ERRO: {error}") 
         except Exception as error:
-            return  {"code": 400, "mensagem": f"ERRO: {error}"}
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
 
     async def generate_id_person(self):
         """
@@ -97,7 +99,6 @@ class PersonRepository:
             if max_id_pessoa is not None:
                 return  max_id_pessoa + 1
         except Exception as error:
-            return  {"code": 404, "mensagem": f"Erro ao consultar id máximo. ERRO: {error}"}
-
+            await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
 
 person_repository = PersonRepository()
