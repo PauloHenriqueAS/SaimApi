@@ -33,6 +33,11 @@
    1. Visualização de dados em dashboards com gráficos dinâmicos e relatórios em tempo real.
 
 ## ⚠️ Comandos Importantes
+- Antes de executar o projeto é necessário realizar o download de todas as bibliotecas utilizadas, para isso basta executar o comando
+  ```
+   pip install requirements.txt
+  ```
+
 - Executar a API usando Uvicorn:
 - Para iniciar a API localmente com Uvicorn, utilize o seguinte comando no terminal:
 - Isso ativará o modo de recarregamento automático, ideal para desenvolvimento, onde a aplicação será recarregada sempre que houver mudanças no código.

@@ -1,0 +1,8 @@
+click==8.1.7
+colorama==0.4.6
+h11==0.14.0
+mysql-connector-python==9.0.0
+mysqlclient==2.2.4
+PyMySQL==1.1.1
+pyodbc==5.1.0
+uvicorn==0.30.6
