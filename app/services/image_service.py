@@ -48,12 +48,12 @@ class ImageService:
             new_id_relation = await image_repository.generate_id_relation()
             data_image.id_imagem = new_id_image
             data_image.id_img_pes = new_id_relation
-
+            
             insert_image = await image_repository.post_image(data_image)
             insert_relation = await image_repository.post_relation_image(data_image)
 
             if (insert_image == True) and (insert_relation == True):
-                await saim_api_response.create_response(True,"Cadastro de imagem realizado com sucesso.")
+                return await saim_api_response.create_response(True, True, 'Cadastro de imagem realizado com sucesso.')
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro no cadastro da imagem. tente novamente. ERRO: {error}")
 

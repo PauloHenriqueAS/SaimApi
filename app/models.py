@@ -27,6 +27,15 @@ class User(BaseModel):
     email_user: str
     password_user: str
 
+class UserAuth(BaseModel):
+    """
+    Model of User
+    """
+    id_user: Optional[int] = None
+    id_pessoa: int
+    email_user: str
+    password_user: str
+
 class UserFull(BaseModel):
     """
     Model of Full data User 

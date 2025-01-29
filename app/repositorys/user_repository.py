@@ -135,8 +135,8 @@ class UserRepository:
             db = SessionLocal()
             max_id_user = db.query(func.max(UserDb.id_user)).scalar()
             db.close()
-            if max_id_user is not None:
-                return max_id_user + 1
+            
+            return (max_id_user or 0) + 1
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
 

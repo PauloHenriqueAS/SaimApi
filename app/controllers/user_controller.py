@@ -23,7 +23,7 @@ async def autenticate_user(data_user: User):
     Verify if user have access to system
     """
     #return await saim_api_response.create_response(True, 'riofjore', 'dofdjmfo')
-    print(data_user)
+    print('data do user', data_user)
 
     return await user_service.autenticate_user(data_user)
 

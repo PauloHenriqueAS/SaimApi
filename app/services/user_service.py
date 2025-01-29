@@ -5,7 +5,7 @@ app/services/user_service.py
 This module contains user-methods.
 """
 import hashlib
-from app.models import User, UserFull
+from app.models import User, UserFull, UserAuth
 from sqlalchemy.exc import IntegrityError
 from app.repositorys.user_repository import user_repository
 from app.repositorys.person_repository import person_repository
@@ -30,14 +30,27 @@ class UserService:
         try:
             user_data_db = await user_repository.get_user_by_code(
                 data_user.email_user)
-            
+
             if user_data_db is None:
                 await saim_api_response.create_error_response(message=f"Usuário não cadastrado")
 
             is_valid = await validate_password_user(
                 user_data_db.password_user, data_user.password_user)
             if is_valid:
-                return await saim_api_response.create_response(True, None, 'Usuário autenticado com sucesso')
+                data_person_db = await person_repository.get_person_by_code(user_data_db.id_user)
+                personId = next(iter(data_person_db)).id_pessoa
+
+                if data_person_db is None or personId is None or personId <= 0:
+                    await saim_api_response.create_error_response(message="Informaçoes da pessoa não encontrado!")
+
+                user_auth = UserAuth(
+                    id_user=user_data_db.id_user,
+                    id_pessoa=personId,
+                    email_user=user_data_db.email_user,
+                    password_user=user_data_db.password_user,
+                )
+
+                return await saim_api_response.create_response(True, user_auth, 'Usuário autenticado com sucesso')
             else:
                 await saim_api_response.create_error_response(message="Usuário sem acesso ao sistema")
         except IntegrityError as error:
@@ -49,8 +62,7 @@ class UserService:
         """
         try:
             data_user.id_user = await user_repository.generate_id_user()
-            data_user.password_user = await encript_password_user(
-                data_user.password_user)
+            data_user.password_user = await encript_password_user(data_user.password_user)
             return await user_repository.post_user(data_user)
         except IntegrityError as error:
             await saim_api_response.create_error_response(message=f"Erro na encriptação da senha. tente novamente. ERRO: {error}")

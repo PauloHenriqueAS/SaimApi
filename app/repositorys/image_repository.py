@@ -58,6 +58,7 @@ class ImageRepository :
             data_new_image_db = DataImageDb(
                 id_image=data_image.id_imagem,
                 image=data_image.image,
+                name_image=data_image.name_image,
                 date_image=datetime.datetime.now()
             )
 
@@ -125,8 +126,8 @@ class ImageRepository :
             db = SessionLocal()
             max_id_image = db.query(func.max(DataImageDb.id_image)).scalar()
             db.close()
-            if max_id_image is not None:
-                return  max_id_image + 1
+            
+            return (max_id_image or 0) + 1
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
                
@@ -138,8 +139,8 @@ class ImageRepository :
             db = SessionLocal()
             max_id_img_pes = db.query(func.max(PersonImageBD.id_img_pes)).scalar()
             db.close()
-            if max_id_img_pes is not None:
-                return  max_id_img_pes + 1
+           
+            return (max_id_img_pes or 0) + 1
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
     
