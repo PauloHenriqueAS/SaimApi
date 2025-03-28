@@ -5,7 +5,7 @@ This module contains user-related routes.
 """
 
 from fastapi import APIRouter
-from app.models import User, UserFull
+from app.models import User, UserFull, UserReset, UserActivate
 from app.services import user_service
 
 router = APIRouter()
@@ -40,12 +40,27 @@ async def post_user_full(data_user_full: UserFull):
     """
     Post data from a new user
     """
+    breakpoint()
     return await user_service.post_user_full(data_user_full)
 
-
-@router.patch("/UpdatePasswordUser")
-async def update_password_user(data_user: User):
+@router.post("/ActivateUserAccess")
+async def activate_user_access(data_user: UserActivate):
     """
     Update data user
     """
-    return await user_service.update_password_user(data_user)
+    return await user_service.activate_user_access(data_user)
+
+
+@router.post("/ResetPasswordUser")
+async def reset_password_user(email_reset: str):
+    """
+    Update data user
+    """
+    return await user_service.reset_password(email_reset)
+
+@router.post("/UpdatePasswordUser")
+async def update_user_password_reseted(data_reset: UserReset):
+    """
+    Update data user
+    """
+    return await user_service.update_user_password_reseted(data_reset)

@@ -48,7 +48,7 @@ class ImageService:
             new_id_relation = await image_repository.generate_id_relation()
             data_image.id_imagem = new_id_image
             data_image.id_img_pes = new_id_relation
-            
+
             insert_image = await image_repository.post_image(data_image)
             insert_relation = await image_repository.post_relation_image(data_image)
 
@@ -62,5 +62,16 @@ class ImageService:
         Update data image
         """
         return await saim_api_response.create_response(True, await image_repository.update_image(data_image))
+
+    async def delete_image(self, id_image: int, id_person: int):
+        """
+        Delete data image
+        """
+        print('dados recebidos', id_image, id_person)
+        wasOperationSuccessful = True
+        wasOperationSuccessful &= await image_repository. delete_relation_image_person(id_image, id_person)
+        wasOperationSuccessful &= await image_repository.delete_image(id_image)
+
+        return await saim_api_response.create_response(wasOperationSuccessful, None, None)
 
 image_service = ImageService()

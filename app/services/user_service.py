@@ -5,12 +5,15 @@ app/services/user_service.py
 This module contains user-methods.
 """
 import hashlib
-from app.models import User, UserFull, UserAuth
+import random
+import string
+from app.models import User, UserFull, UserAuth, UserActivate, UserReset
 from sqlalchemy.exc import IntegrityError
 from app.repositorys.user_repository import user_repository
 from app.repositorys.person_repository import person_repository
 from app.middleware import saim_api_response
 from app.middleware import helper
+
 
 class UserService:
     """
@@ -28,14 +31,15 @@ class UserService:
         Autenticate user system
         """
         try:
-            user_data_db = await user_repository.get_user_by_code(
-                data_user.email_user)
+            user_data_db = await user_repository.get_user_by_code(data_user.email_user)
 
             if user_data_db is None:
                 await saim_api_response.create_error_response(message=f"Usuário não cadastrado")
 
-            is_valid = await validate_password_user(
-                user_data_db.password_user, data_user.password_user)
+            if user_data_db.flg_activated is None or user_data_db.flg_activated is False:
+                await saim_api_response.create_error_response(message=f"Usuário não ativado verifique seu email para realizar a ativação.")
+
+            is_valid = await validate_password_user(user_data_db.password_user, data_user.password_user)
             if is_valid:
                 data_person_db = await person_repository.get_person_by_code(user_data_db.id_user)
                 personId = next(iter(data_person_db)).id_pessoa
@@ -87,11 +91,12 @@ class UserService:
             is_valid = await validate_password_request(
                 data_user_full.password_user, data_user_full.password_confirmation)
 
+            breakpoint()
             if is_valid:
                 data_user_full.id_user = await user_repository.generate_id_user()
                 data_user_full.id_pessoa = await person_repository.generate_id_person()
-                data_user_full.password_user = await encript_password_user(
-                    data_user_full.password_user)
+                data_user_full.password_user = await encript_password_user(data_user_full.password_user)
+                data_user_full.token_reset = await encript_password_user(await generate_token())
 
                 return await saim_api_response.create_response(True, None, await user_repository.post_user_full(data_user_full))
             else:
@@ -109,6 +114,64 @@ class UserService:
             return await saim_api_response.create_response(True, None, await user_repository.update_password_user(data_user))
         except IntegrityError as error:
             await saim_api_response.create_error_response(message=f"Erro na atualização de senha. tente novamente. ERRO: {error}")
+
+    async def activate_user_access(self, data_user: UserActivate):
+        try:
+            # pegar o token preestabelecido no banco de dados e comparar com o que o usuario enviou e atulizar ele para ativo
+            user_data_db = await user_repository.get_user_by_code(data_user.email_user)
+            if user_data_db is None:
+                await saim_api_response.create_error_response(message=f"Usuário não cadastrado")
+
+            is_valid = await validate_token_user(user_data_db.token_reset, data_user.token_activate)
+            # Marcar user como ativo
+            if is_valid:
+                new_token_reset = await encript_password_user(await generate_token())
+                return await saim_api_response.create_response(True, None, await user_repository.activate_user(data_user.email_user, new_token_reset))
+            else:
+                return await saim_api_response.create_error_response(message=f"Erro na ativação do usuário. Token Inválido")
+        except IntegrityError as error:
+            await saim_api_response.create_error_response(message=f"Erro na ativação do usuário. Tente novamente. ERRO: {error}")
+
+    async def reset_password(self, email_reset: str):
+        try:
+            # pegar o token preestabelecido no banco de dados e comparar com o que o usuario enviou e atulizar ele para ativo
+            user_data_db = await user_repository.get_user_by_code(email_reset)
+            if user_data_db is None:
+                await saim_api_response.create_error_response(message=f"Usuário não cadastrado")
+
+            password_sys = await encript_password_user(await generate_password_reset())
+            data_user = User(
+                email_user=email_reset,
+                password_user=password_sys
+            )
+            # Reseta a senha o usuario e envia por email
+
+            return await saim_api_response.create_response(True, None, await user_repository.update_password_user(data_user))
+        except IntegrityError as error:
+            await saim_api_response.create_error_response(message=f"Erro na ativação do usuário. Tente novamente. ERRO: {error}")
+
+    async def update_user_password_reseted(self, data_reset: UserReset):
+        try:
+            # pegar o token preestabelecido no banco de dados e comparar com o que o usuario enviou e atulizar ele para ativo
+            user_data_db = await user_repository.get_user_by_code(data_reset.email_user)
+            if user_data_db is None:
+                await saim_api_response.create_error_response(message=f"Usuário não cadastrado")
+
+            is_valid = await validate_token_user(user_data_db.password_user, data_reset.password_temp)
+            if is_valid:
+                new_psw_encript = await encript_password_user(data_reset.password_new)
+
+                data_user = User(
+                    email_user=data_reset.email_user,
+                    password_user=new_psw_encript
+                )
+                
+                return await saim_api_response.create_response(True, None, await user_repository.update_password_user(data_user))
+            else:
+                return await saim_api_response.create_error_response(message=f"Erro na atulaização de senha do usuário. Senha temporária inválida.")
+        except IntegrityError as error:
+            await saim_api_response.create_error_response(message=f"Erro na atualização do usuário. Tente novamente. ERRO: {error}")
+
 
 async def encript_password_user(password: str):
     '''
@@ -129,7 +192,7 @@ async def validate_password_user(password_db: str, password_request: str):
     '''
     if password_db is None or password_db == "" or password_request is None or password_request == "":
         await saim_api_response.create_error_response(message=f"Senha inválida")
-    
+
     password_hash_request = await encript_password_user(password_request)
     if password_db == password_hash_request:
         return True
@@ -148,5 +211,35 @@ async def validate_password_request(password_request: str, password_confirm: str
     else:
         return False
 
+
+async def validate_token_user(token_db: str, token_request: str):
+    '''
+    Method to verify user password in data base and in requestuser password
+    '''
+    if token_db is None or token_db == "" or token_request is None or token_request == "":
+        await saim_api_response.create_error_response(message=f"Token informado inválido!")
+
+    token_hash = await encript_password_user(token_request)
+    if token_db == token_hash:
+        return True
+    else:
+        return False
+
+
+async def generate_token():
+    # Letras maiúsculas, minúsculas e números
+    characters = string.ascii_letters + string.digits
+    new_token = ''.join(random.choices(characters, k=6))
+    print(new_token)
+    return new_token
+    # Enviar pelo email o token de ativação
+
+
+async def generate_password_reset():
+    characters = string.ascii_letters + string.digits + \
+        string.punctuation  # Letras maiúsculas, minúsculas e números
+    new_password = ''.join(random.choices(characters, k=10))
+    print('NOva senha', new_password)
+    return new_password
 
 user_service = UserService()

@@ -38,3 +38,10 @@ async def update_image(data_image: DataFullPersonImage):
     Update data image
     """
     return await image_service.update_image(data_image)
+
+@router.delete("/DeleteImage")
+async def delete_image(id_image: int, id_person: int):
+    """
+    Delete data image
+    """
+    return await image_service.delete_image(id_image, id_person)

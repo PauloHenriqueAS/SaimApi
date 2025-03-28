@@ -9,7 +9,7 @@ class ImageProcessingRepository :
     """
     return algo
     """
-    def get_image_thresholded(self, image: str):
+    def get_image_threshold(self, image_base64: str, min: int, max: int):
         """
         return algo
         """

@@ -12,23 +12,26 @@ from .configDb import SessionLocal
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
-class ImageRepository :
+
+class ImageRepository:
     """
     return  algo
     """
+
     async def get_image_by_code(self, id_image: int):
         """
         Get Image by code
         """
         try:
             db = SessionLocal()
-            image = db.query(DataImageDb).filter(DataImageDb.id_image == id_image).first()
+            image = db.query(DataImageDb).filter(
+                DataImageDb.id_image == id_image).first()
             db.close()
 
             if image is None:
                 await saim_api_response.create_error_response(message="Imagem não encontrada")
             else:
-                return  image 
+                return image
         except IntegrityError as error:
             await saim_api_response.create_error_response(message=f"Erro ao obter imagem. ERRO: {error}")
 
@@ -38,16 +41,17 @@ class ImageRepository :
         """
         try:
             db = SessionLocal()
-            lst_img_person = db.query(PersonImageBD).filter(PersonImageBD.id_pessoa == id_person).all()
+            lst_img_person = db.query(PersonImageBD).filter(
+                PersonImageBD.id_pessoa == id_person).all()
             db.close()
 
             if not lst_img_person:
-                return  []
+                return []
             else:
-                return  [{'id_image': img_pes.id_image} for img_pes in lst_img_person]
+                return [{'id_image': img_pes.id_image} for img_pes in lst_img_person]
         except IntegrityError as error:
             await saim_api_response.create_error_response(message=f"Erro ao obter imagem. ERRO: {error}")
-       
+
     async def post_image(self, data_image: DataFullPersonImage):
         """
         Insert new data image
@@ -59,6 +63,7 @@ class ImageRepository :
                 id_image=data_image.id_imagem,
                 image=data_image.image,
                 name_image=data_image.name_image,
+                extension_image=data_image.extension_image,
                 date_image=datetime.datetime.now()
             )
 
@@ -66,13 +71,13 @@ class ImageRepository :
             db.commit()
             db.close()
 
-            return  True 
+            return True
         except IntegrityError as error:
             db.rollback()
             await saim_api_response.create_error_response(message=f"Erro ao cadastrar imagem. ERRO: {error}")
         except Exception as error:
             await saim_api_response.create_error_response(message=f"ERRO: {error}")
-        
+
     async def post_relation_image(self, data_image: DataFullPersonImage):
         """
         Insert new relation data image-person
@@ -90,34 +95,78 @@ class ImageRepository :
             db.commit()
             db.close()
 
-            return  True 
+            return True
         except IntegrityError as error:
             db.rollback()
             await saim_api_response.create_error_response(message=f"Erro ao cadastrar relação de imagem e pessoa. ERRO: {error}")
         except Exception as error:
             await saim_api_response.create_error_response(message=f"ERRO: {error}")
-        
+
     async def update_image(self, data_image: DataFullPersonImage):
         """
         Update data image
         """
         try:
             db = SessionLocal()
-            
-            image_data_db = db.query(DataImageDb).filter(DataImageDb.id_image == data_image.id_imagem).first()
+
+            image_data_db = db.query(DataImageDb).filter(
+                DataImageDb.id_image == data_image.id_imagem).first()
             if image_data_db:
                 image_data_db.image = data_image.image
 
             db.commit()
             db.close()
 
-            return  { "code": 200, "mensagem": "Imagem atualizada com sucesso."}
+            return {"code": 200, "mensagem": "Imagem atualizada com sucesso."}
         except IntegrityError as error:
-            db.rollback() 
+            db.rollback()
             await saim_api_response.create_error_response(message=f"Erro ao atualizar imagem. ERRO: {error}")
         except Exception as error:
             await saim_api_response.create_error_response(message=f"ERRO: {error}")
-        
+
+    async def delete_image(self, id_image: int):
+        """
+        Delete image by ID 
+        """
+        try:
+            with SessionLocal() as db:
+                image_data_db = db.query(DataImageDb).filter(
+                    DataImageDb.id_image == id_image).first()
+
+                if image_data_db:
+                    db.delete(image_data_db)
+                    db.commit()
+                    return True
+                return False
+
+        except IntegrityError as error:
+            await saim_api_response.create_error_response(message=f"Erro ao deletar imagem. ERRO: {error}")
+        except Exception as error:
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
+
+    async def delete_relation_image_person(self, id_image: int, id_person: int):
+        """
+        Delete relation image by ID and Person ID
+        """
+        try:
+            with SessionLocal() as db:
+                relation_image_db = db.query(PersonImageBD).filter(
+                    PersonImageBD.id_image == id_image,
+                    PersonImageBD.id_pessoa == id_person
+                ).first()
+
+
+                if relation_image_db:
+                    db.delete(relation_image_db)
+                    db.commit()
+                    return True
+                return False
+
+        except IntegrityError as error:
+            await saim_api_response.create_error_response(message=f"Erro ao deletar relacionamento da imagem. ERRO: {error}")
+        except Exception as error:
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
+
     async def generate_id_image(self):
         """
         Generate new id image to insert method
@@ -126,22 +175,24 @@ class ImageRepository :
             db = SessionLocal()
             max_id_image = db.query(func.max(DataImageDb.id_image)).scalar()
             db.close()
-            
+
             return (max_id_image or 0) + 1
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
-               
+
     async def generate_id_relation(self):
         """
         Generate new id user to insert method
         """
         try:
             db = SessionLocal()
-            max_id_img_pes = db.query(func.max(PersonImageBD.id_img_pes)).scalar()
+            max_id_img_pes = db.query(
+                func.max(PersonImageBD.id_img_pes)).scalar()
             db.close()
-           
+
             return (max_id_img_pes or 0) + 1
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
-    
-image_repository  = ImageRepository ()
+
+
+image_repository = ImageRepository()

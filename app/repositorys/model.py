@@ -4,7 +4,7 @@ app/Repositorys/model.py
 This module contains database models.
 """
 
-from sqlalchemy import Column, Date, Integer, String, Text
+from sqlalchemy import Column, Date, Integer, String, Text, Boolean
 from app.repositorys.configDb import Base
 
 class UserDb(Base):
@@ -17,6 +17,8 @@ class UserDb(Base):
     id_user = Column(Integer, primary_key=True, index=True)
     email_user = Column(String, index=True)
     password_user = Column(String, index=True)
+    flg_activated = Column(Boolean, index=True)
+    token_reset = Column(String, index=True)
 
 class PersonDb(Base):
     '''
@@ -43,6 +45,7 @@ class DataImageDb(Base):
     image = Column(Text, index=True)
     date_image = Column(Date, index=True)
     name_image = Column(String, index=True)
+    extension_image = Column(String, index=True)
 
 class PersonImageBD(Base):
     '''

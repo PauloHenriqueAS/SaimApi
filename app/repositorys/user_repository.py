@@ -68,7 +68,6 @@ class UserRepository:
         Insert new user data
         """
         try:
-            breakpoint()
             db = SessionLocal()
             transaction = db.begin()
 
@@ -77,7 +76,9 @@ class UserRepository:
                 data_user = UserDb(
                     id_user=data_user_full.id_user if data_user_full.id_user is not None else 1,
                     email_user=data_user_full.email_user,
-                    password_user=data_user_full.password_user
+                    password_user=data_user_full.password_user,
+                    flg_activated=False,
+                    token_reset=data_user_full.token_reset
                 )
                 db.add(data_user)
                 db.flush()
@@ -112,8 +113,7 @@ class UserRepository:
         try:
             db = SessionLocal()
 
-            user_data_db = db.query(UserDb).filter(
-                UserDb.email_user == data_user.email_user).first()
+            user_data_db = db.query(UserDb).filter(UserDb.email_user == data_user.email_user).first()
             if user_data_db:
                 user_data_db.password_user = data_user.password_user
 
@@ -139,5 +139,28 @@ class UserRepository:
             return (max_id_user or 0) + 1
         except Exception as error:
             await saim_api_response.create_error_response(message=f"Erro ao consultar id máximo. ERRO: {error}")
+
+
+    async def activate_user(self, email_user: str, token_reset: str):
+        """
+        Update user password
+        """
+        try:
+            db = SessionLocal()
+
+            user_data_db = db.query(UserDb).filter(UserDb.email_user == email_user).first()
+            if user_data_db:
+                user_data_db.token_reset = token_reset,
+                user_data_db.flg_activated = True
+
+            db.commit()
+            db.close()
+
+            return "Usuário ativado com sucesso."
+        except IntegrityError as error:
+            db.rollback()
+            await saim_api_response.create_error_response(message=f"Erro ao atualizar usuário. ERRO: {error}")
+        except Exception as error:
+            await saim_api_response.create_error_response(message=f"ERRO: {error}")
 
 user_repository = UserRepository()

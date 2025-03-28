@@ -6,3 +6,7 @@ mysqlclient==2.2.4
 PyMySQL==1.1.1
 pyodbc==5.1.0
 uvicorn==0.30.6
+numpy==2.2.3
+#opencv==4.11.0.86
+pillow==11.1.0
+opencv-contrib-python==4.11.0.86
