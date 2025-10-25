@@ -37,6 +37,7 @@ class UserAuth(BaseModel):
     id_pessoa: int
     email_user: str
     password_user: str
+    user_activated: Optional[bool] = None
 
 class UserFull(BaseModel):
     """
@@ -86,75 +87,93 @@ class ImageThreshold(BaseModel):
     """
     Model of Image Threshold
     """
-    id_image: int
+    id_image: Optional[int] = None
     val_min: int
     val_max: int
+    image: Optional[Text] = None
 
 class ImageBlur(BaseModel):
     """
     Model of Image Blur
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size: int
+    image: Optional[Text] = None
 
 class ImageDilate(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size: int
     num_iterations : int
+    image: Optional[Text] = None
 
 class ImageErosion(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size: int
     num_iterations : int
+    image: Optional[Text] = None
     
 class ImageSobelX(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size: int
+    image: Optional[Text] = None
 
 class ImageSobelY(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size: int
+    image: Optional[Text] = None
 
 class ImageSobelXY(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size_X: int 
     kernel_size_Y: int
+    image: Optional[Text] = None
 
 class ImageLaplacian(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     kernel_size: int
+    image: Optional[Text] = None
 
 class ImageThinning(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
+    image: Optional[Text] = None
+
+class ImageMensureAuto(BaseModel):
+    """
+    Model of Image Dilate
+    """
+    id_image: Optional[int] = None
+    image: Optional[Text] = None
+
 class ImageMeasurement(BaseModel):
     """
     Model of Image Dilate
     """
-    id_image: int
+    id_image: Optional[int] = None
     min_size: int
     format_filter: str
     unit_measurement: str
+    image: Optional[Text] = None
 
 class UserReset(BaseModel):
     """

@@ -6,7 +6,7 @@ module with routes of image processing methods.
 
 from fastapi import APIRouter
 from app.services import process_service
-from app.models import ImageThreshold,ImageBlur, ImageDilate, ImageErosion, ImageSobelX, ImageSobelY, ImageSobelXY, ImageLaplacian, ImageThinning, ImageMeasurement
+from app.models import ImageThreshold,ImageBlur, ImageDilate, ImageErosion,ImageMensureAuto, ImageSobelX, ImageSobelY, ImageSobelXY, ImageLaplacian, ImageThinning, ImageMeasurement
 
 router = APIRouter()
 
@@ -73,9 +73,9 @@ async def get_image_thinning(dataImageThinning: ImageThinning):
     """
     return await process_service.get_image_thinning(dataImageThinning)
 
-# @router.post("/Measurement")
-# async def get_image_measurement(dataImageMeasurement: ImageMeasurement):
-#     """
-#     Return image from image by id_person
-#     """
-#     return await process_service.get_image_measurement(dataImageMeasurement)
+@router.post("/MeasurementAuto")
+async def get_image_measure_automatic_regions(dataImageMensureAuto: ImageMensureAuto):
+    """
+    Return image from image by id_person
+    """
+    return await process_service.measure_automatic_regions(dataImageMensureAuto)
